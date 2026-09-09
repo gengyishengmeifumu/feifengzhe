@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>飞冯者行动 · 核芯解密</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
+        body { background: linear-gradient(145deg, #0a1218 0%, #18262e 100%); min-height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .card { background: rgba(10, 25, 30, 0.85); backdrop-filter: blur(14px); border: 1px solid rgba(80, 180, 200, 0.2); border-radius: 48px; padding: 40px 36px; max-width: 860px; width: 100%; box-shadow: 0 30px 50px rgba(0, 0, 0, 0.8); }
+        h1 { text-align: center; font-weight: 700; font-size: 2.4rem; letter-spacing: 4px; margin: 0 0 4px 0; color: #c8edf5; text-shadow: 0 0 30px rgba(0, 200, 220, 0.15); display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+        h1 span { background: rgba(80, 200, 220, 0.08); padding: 0 22px; border-radius: 60px; font-size: 1.6rem; border: 1px solid rgba(80, 200, 220, 0.15); }
+        .sub { text-align: center; color: #7fb4c2; font-weight: 300; letter-spacing: 2px; margin-top: -6px; margin-bottom: 28px; font-size: 0.85rem; opacity: 0.7; }
+        .step-box { background: rgba(8, 30, 38, 0.6); border-radius: 28px; padding: 22px 24px; margin-bottom: 20px; border-left: 4px solid #4fc3d0; box-shadow: inset 0 2px 10px rgba(0,0,0,0.4); }
+        .step-title { display: flex; align-items: center; gap: 12px; font-weight: 600; color: #aadce8; font-size: 1.05rem; margin-bottom: 14px; flex-wrap: wrap; }
+        .step-title .badge { background: #4fc3d0; color: #0b1e24; padding: 0 16px; border-radius: 40px; font-size: 0.7rem; font-weight: 700; line-height: 26px; }
+        .code-block { background: #0a1f26; border-radius: 20px; padding: 16px 20px; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 1rem; color: #b2dde8; word-break: break-all; border: 1px solid #2d5966; box-shadow: inset 0 4px 8px rgba(0,0,0,0.6); margin: 8px 0 10px 0; line-height: 1.8; cursor: pointer; transition: 0.15s; }
+        .code-block:hover { border-color: #64d8e6; }
+        .code-block .highlight { color: #f7e05e; font-weight: 500; }
+        .riddle-hint { background: #17323d; border-radius: 40px; padding: 12px 22px; color: #cae1ed; font-size: 0.92rem; border-left: 3px solid #64d8e6; margin: 12px 0 4px 0; font-style: italic; letter-spacing: 0.3px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; cursor: pointer; transition: 0.15s; }
+        .riddle-hint:hover { background: #1f4050; border-color: #a0e8f0; }
+        .step-progress { display: flex; gap: 8px; justify-content: center; margin: 12px 0 4px 0; }
+        .dot { width: 12px; height: 12px; border-radius: 20px; background: #2d5a66; transition: 0.2s; }
+        .dot.active { background: #64d8e6; box-shadow: 0 0 16px #64d8e688; }
+        .dot.done { background: #54b0c0; }
+        .input-group { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 18px 0 10px 0; background: rgba(0, 20, 28, 0.5); padding: 18px 22px; border-radius: 40px; border: 1px solid #2d5a66; }
+        .input-group label { color: #b6dce8; font-weight: 500; min-width: 80px; }
+        .input-group input { flex: 1; min-width: 150px; background: #0e2730; border: 1px solid #3a7180; border-radius: 60px; padding: 14px 20px; font-size: 1rem; color: #eaf6fa; outline: none; transition: 0.2s; font-family: 'JetBrains Mono', monospace; }
+        .input-group input:focus { border-color: #64d8e6; box-shadow: 0 0 0 3px rgba(100, 216, 230, 0.2); }
+        .input-group input::placeholder { color: #4e7f8c; }
+        .action-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; margin-top: 16px; }
+        .btn { background: #64d8e6; border: none; border-radius: 60px; padding: 14px 32px; font-weight: 700; font-size: 1rem; color: #0b1e24; cursor: pointer; transition: all 0.15s ease; box-shadow: 0 6px 0 #2f7b86, 0 8px 20px rgba(0,0,0,0.5); display: inline-flex; align-items: center; gap: 8px; flex: 1 1 auto; justify-content: center; }
+        .btn:active { transform: translateY(5px); box-shadow: 0 1px 0 #2f7b86; }
+        .btn-secondary { background: #3d6f7a; box-shadow: 0 6px 0 #1d4450; color: #e0f2f7; }
+        .btn-secondary:active { transform: translateY(5px); box-shadow: 0 1px 0 #1d4450; }
+        .btn-warning { background: #ff8a6b; box-shadow: 0 6px 0 #a0553a; color: #0b1e24; }
+        .btn-warning:active { transform: translateY(5px); box-shadow: 0 1px 0 #a0553a; }
+        .result-area { margin-top: 24px; background: rgba(4, 28, 36, 0.6); border-radius: 28px; padding: 22px 26px; border: 1px solid #2e6675; min-height: 80px; }
+        .result-area .success { color: #b0f0d0; }
+        .result-area .fail { color: #f7b0a8; }
+        .text-muted { color: #7daebd; font-size: 0.95rem; }
+        .big-reveal { font-size: 2.8rem; font-weight: 700; text-align: center; padding: 16px 10px; background: radial-gradient(circle at 20% 30%, #d4faff, #8ad4e0); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 0 40px rgba(80, 220, 240, 0.2); letter-spacing: 6px; }
+        .hidden-area { display: none; }
+        .final-link-box { background: #0f2a33; border-radius: 20px; padding: 16px 22px; margin-top: 16px; text-align: center; border: 1px dashed #4fc3d0; }
+        .final-link-box a { color: #64d8e6; font-size: 1.1rem; word-break: break-all; text-decoration: none; font-weight: 500; }
+        .final-link-box a:hover { text-decoration: underline; color: #a0e8f0; }
+        hr { border: 0.5px solid #2a5a66; margin: 20px 0 14px 0; }
+        .footer-tip { display: flex; justify-content: space-between; font-size: 0.7rem; color: #3e7888; padding: 0 8px; }
+        .nuclear-badge { display: inline-block; background: #ff6b4a22; color: #ff8a6b; padding: 2px 14px; border-radius: 40px; font-size: 0.7rem; border: 1px solid #ff6b4a44; }
+        .site-hint { background: #1a3a44; border-radius: 16px; padding: 14px 20px; margin: 10px 0; border-left: 3px solid #ff8a6b; color: #b6dce8; }
+        .site-hint code { color: #f7e05e; background: #0a1f26; padding: 2px 12px; border-radius: 8px; font-size: 0.9rem; }
+        .exercise-box { background: #0a1f26; border-radius: 20px; padding: 20px 24px; border: 1px solid #2d5966; margin: 10px 0; }
+        .exercise-box p { color: #cae1ed; line-height: 1.8; margin: 6px 0; }
+        .exercise-box .question { color: #f7e05e; font-weight: 600; }
+        .exercise-box .answer-input { background: #0e2730; border: 1px solid #3a7180; border-radius: 60px; padding: 12px 20px; font-size: 1rem; color: #eaf6fa; outline: none; width: 100%; margin: 10px 0; font-family: 'JetBrains Mono', monospace; }
+        .exercise-box .answer-input:focus { border-color: #64d8e6; box-shadow: 0 0 0 3px rgba(100, 216, 230, 0.2); }
+        .locked-content { filter: blur(10px); user-select: none; pointer-events: none; transition: 0.3s; }
+        .unlocked-content { filter: blur(0); user-select: text; pointer-events: auto; transition: 0.3s; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>☢️ 飞冯者·核芯 <span>⚡</span></h1>
+    <div class="sub">反应堆级解密 · 多重验证 · 密码隐于习题</div>
+
+    <div class="step-box">
+        <div class="step-title">
+            <span class="badge">📌 当前</span>
+            <span id="stepDescription">第一阶段 · 寻找密钥</span>
+            <span class="nuclear-badge">☢️ 裂变</span>
+        </div>
+        <div id="stepContent" class="code-block">
+            <div class="site-hint">
+                <p style="margin: 0 0 6px 0;">🔐 第一层密码位于以下站点，请前往获取：</p>
+                <code>df.qq.com/cp/havvkrelink</code>
+                <p style="margin: 8px 0 0 0; font-size: 0.85rem; color: #7fb4c2;">在页面中找到隐藏的密码输入框，输入后获取第一层密钥</p>
+            </div>
+        </div>
+        <div id="riddleHint" class="riddle-hint">
+            <span class="icon">🔮</span>
+            <span id="riddleText">「密钥隐于站点中，输入即得第一重；核芯习题随后至，解出二进制真容。」</span>
+        </div>
+        <div class="step-progress" id="stepDots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+
+    <!-- 第一层密码输入 -->
+    <div class="input-group" style="border-color: #ff6b4a44;">
+        <label style="color: #ff8a6b;">🔐 第一层</label>
+        <input type="password" id="layer1Input" placeholder="从站点获取的第一层密码" value="">
+        <button class="btn btn-warning" id="unlockLayer1Btn" style="flex: 0 1 auto; padding: 10px 24px;">验证</button>
+    </div>
+
+    <!-- 习题区域 -->
+    <div id="exerciseArea" class="hidden-area">
+        <div class="exercise-box">
+            <p class="question">⚛️ 核电站习题 · 请解答以下问题：</p>
+            <p>【反应堆物理】某压水堆核电站，燃料组件为17×17排列，</p>
+            <p>每组件含264根燃料棒，堆芯共157个组件。</p>
+            <p>已知：热功率为 3400 MW，燃料棒线功率密度为 18.5 kW/m，</p>
+            <p>燃料有效高度为 3.66 m。</p>
+            <p style="margin-top: 12px; color: #f7e05e;">❓ 问题：堆芯总燃料棒数量是多少？（输入数字）</p>
+            <input type="text" id="exerciseAnswer" class="answer-input" placeholder="输入答案数字">
+            <button class="btn" id="submitExerciseBtn" style="margin-top: 8px; background: #ffb347; box-shadow: 0 6px 0 #a06f2a;">提交答案 · 获取二进制</button>
+        </div>
+    </div>
+
+    <!-- 第二阶段：二进制 -->
+    <div id="binaryArea" class="hidden-area">
+        <div class="code-block">
+            <span class="highlight">⚛️ 二进制编码</span>
+            <div id="binaryDisplay" class="locked-content" style="font-size: 0.9rem; padding: 12px 0; font-family: 'JetBrains Mono', monospace;">
+                01000011 01011000 01011010 01001101 01010100 01001110 00110001 01010111 01001110 01000011 01000100
+            </div>
+            <p style="color: #7fb4c2; font-size: 0.85rem; margin-top: 6px;">🔑 将此二进制解码获得第二层密码</p>
+        </div>
+        <div class="riddle-hint" style="margin-top: 4px;">
+            <span class="icon">🔮</span>
+            <span>「零一之间藏玄机，解码之后得密钥；ASCII转字符现，第二重门为你启。」</span>
+        </div>
+    </div>
+
+    <!-- 第二层密码输入 -->
+    <div id="layer2Area" class="hidden-area">
+        <div class="input-group" style="border-color: #4fc3d044;">
+            <label style="color: #64d8e6;">🔐 第二层</label>
+            <input type="password" id="layer2Input" placeholder="解码二进制得到的第二层密码" value="">
+            <button class="btn" id="unlockLayer2Btn" style="flex: 0 1 auto; padding: 10px 24px;">验证</button>
+        </div>
+    </div>
+
+    <!-- 最终 -->
+    <div id="finalArea" class="hidden-area">
+        <div class="input-group">
+            <label>👤 用户名</label>
+            <input type="text" id="usernameInput" placeholder="中间解出的用户名" value="" readonly style="color: #64d8e6;">
+        </div>
+        <div class="input-group" style="margin-top: -6px;">
+            <label>🔑 密码</label>
+            <input type="text" id="passwordInput" placeholder="最终密码" value="" readonly style="color: #f7e05e;">
+        </div>
+        <div class="action-row">
+            <button class="btn" id="unlockBtn">🚀 解锁 · 进入</button>
+        </div>
+    </div>
+
+    <div id="resultPanel" class="result-area">
+        <div id="messageBox" class="text-muted" style="text-align: center; padding: 6px 0;">
+            ⚡ 先获取第一层密码，完成习题解锁二进制
+        </div>
+        <div id="bigRevealContainer" class="hidden-area">
+            <div class="big-reveal" id="bigRevealText">耿熠晟扫码了</div>
+            <div style="text-align: center; color: #9ed4e0; margin-top: 4px;">✅ 核芯认证通过</div>
+        </div>
+        <div id="finalLinkContainer" class="hidden-area">
+            <div class="final-link-box">
+                <p style="color: #b6dce8; margin: 0 0 8px 0;">🌐 目标站点</p>
+                <a href="https://df.qq.com/cp/havvkrelink" target="_blank">df.qq.com/cp/havvkrelink</a>
+                <p style="color: #5e8f9e; font-size: 0.8rem; margin-top: 8px;">✅ 使用上方密码完成最终验证</p>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+    <div class="footer-tip">
+        <span>🔗 流程: 站点获取密钥 → 习题 → 二进制 → 第二层密码 → 用户名 → 最终密码</span>
+        <span>🧩 所有密码均隐于编码中</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const LAYER1_PASSWORD = "3707006600874797";
+        const EXERCISE_ANSWER = "41448";
+        const LAYER2_PASSWORD = "CXZMTN1WNCD";
+        const USERNAME = "GYS2026";
+        const FINAL_PASSWORD = "FLUX2026";
+
+        const stepDesc = document.getElementById('stepDescription');
+        const stepContent = document.getElementById('stepContent');
+        const riddleText = document.getElementById('riddleText');
+        const stepDots = document.getElementById('stepDots');
+        const layer1Input = document.getElementById('layer1Input');
+        const unlockLayer1Btn = document.getElementById('unlockLayer1Btn');
+        const exerciseArea = document.getElementById('exerciseArea');
+        const exerciseAnswer = document.getElementById('exerciseAnswer');
+        const submitExerciseBtn = document.getElementById('submitExerciseBtn');
+        const binaryArea = document.getElementById('binaryArea');
+        const binaryDisplay = document.getElementById('binaryDisplay');
+        const layer2Area = document.getElementById('layer2Area');
+        const layer2Input = document.getElementById('layer2Input');
+        const unlockLayer2Btn = document.getElementById('unlockLayer2Btn');
+        const finalArea = document.getElementById('finalArea');
+        const usernameInput = document.getElementById('usernameInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const unlockBtn = document.getElementById('unlockBtn');
+        const messageBox = document.getElementById('messageBox');
+        const bigRevealContainer = document.getElementById('bigRevealContainer');
+        const bigRevealText = document.getElementById('bigRevealText');
+        const finalLinkContainer = document.getElementById('finalLinkContainer');
+
+        let step = 0;
+
+        function updateUI() {
+            const dots = stepDots.querySelectorAll('.dot');
+            dots.forEach((dot, i) => {
+                dot.classList.remove('active', 'done');
+                if (i === step) dot.classList.add('active');
+                else if (i < step) dot.classList.add('done');
+            });
+            const descs = ['第一阶段 · 寻找密钥', '第二阶段 · 核芯习题', '第三阶段 · 二进制解码', '第四阶段 · 第二层验证', '第五阶段 · 完成认证'];
+            stepDesc.textContent = descs[step] || descs[0];
+        }
+
+        function unlockLayer1() {
+            if (layer1Input.value.trim() === LAYER1_PASSWORD) {
+                step = 1; updateUI();
+                exerciseArea.classList.remove('hidden-area');
+                messageBox.innerHTML = '✅ 第一层验证通过！请解答核电站习题';
+                messageBox.className = 'success';
+                stepContent.innerHTML = `<div class="site-hint" style="border-color: #64d8e6;"><p style="margin:0;color:#b0f0d0;">✅ 第一层密码验证通过！</p><p style="margin:6px 0 0 0;font-size:0.85rem;color:#7fb4c2;">进入下一阶段：解答核芯习题获取二进制</p></div>`;
+                riddleText.textContent = '「核芯习题须解答，燃料棒数算出来；二进制码随后现，解码得第二重开。」';
+            } else {
+                messageBox.innerHTML = '❌ 第一层密码错误，请从站点获取正确密钥';
+                messageBox.className = 'fail';
+            }
+        }
+
+        function submitExercise() {
+            if (step < 1) { messageBox.innerHTML = '⚠️ 请先完成第一层验证'; messageBox.className = 'fail'; return; }
+            if (exerciseAnswer.value.trim() === EXERCISE_ANSWER) {
+                step = 2; updateUI();
+                binaryArea.classList.remove('hidden-area');
+                layer2Area.classList.remove('hidden-area');
+                binaryDisplay.classList.remove('locked-content');
+                binaryDisplay.classList.add('unlocked-content');
+                messageBox.innerHTML = '✅ 习题正确！二进制编码已解锁，请解码获取第二层密码';
+                messageBox.className = 'success';
+                stepContent.innerHTML = `<div style="color:#b0f0d0;padding:10px 0;">✅ 习题解答正确！<br><span style="color:#f7e05e;">二进制编码</span> 已在下方面板显示</div>`;
+                riddleText.textContent = '「零一之间藏玄机，ASCII转字符现；CXZMTN1WNCD，第二重门为你启。」';
+            } else {
+                messageBox.innerHTML = '❌ 习题答案错误，请重新计算（264 × 157）';
+                messageBox.className = 'fail';
+            }
+        }
+
+        function unlockLayer2() {
+            if (step < 2) { messageBox.innerHTML = '⚠️ 请先完成习题获取二进制'; messageBox.className = 'fail'; return; }
+            if (layer2Input.value.trim() === LAYER2_PASSWORD) {
+                step = 3; updateUI();
+                finalArea.classList.remove('hidden-area');
+                usernameInput.value = USERNAME;
+                passwordInput.value = FINAL_PASSWORD;
+                messageBox.innerHTML = `✅ 第二层验证通过！<br>👤 用户名: ${USERNAME}<br>🔑 最终密码: ${FINAL_PASSWORD}`;
+                messageBox.className = 'success';
+                stepContent.innerHTML = `<div style="color:#b0f0d0;padding:10px 0;">✅ 第二层验证通过！<br><span style="color:#f7e05e;">用户名: ${USERNAME}</span><br><span style="color:#64d8e6;">最终密码: ${FINAL_PASSWORD}</span></div>`;
+                riddleText.textContent = `「恭喜！用户名 ${USERNAME}，密码 ${FINAL_PASSWORD}，点击解锁进入。」`;
+            } else {
+                messageBox.innerHTML = '❌ 第二层密码错误，请重新解码二进制';
+                messageBox.className = 'fail';
+            }
+        }
+
+        function handleUnlock() {
+            if (step < 3) { messageBox.innerHTML = '⚠️ 请完成所有验证步骤'; messageBox.className = 'fail'; return; }
+            step = 4; updateUI();
+            bigRevealContainer.classList.remove('hidden-area');
+            bigRevealText.textContent = '耿熠晟扫码了';
+            finalLinkContainer.classList.remove('hidden-area');
+            messageBox.innerHTML = '✅ 认证通过！ 前往下方链接完成最后一步';
+            messageBox.className = 'success';
+            stepContent.innerHTML = `<div style="color:#b0f0d0;padding:10px 0;text-align:center;">🎉 飞冯者行动成功！<br><span style="font-size:2rem;">耿熠晟扫码了</span></div>`;
+            riddleText.textContent = '「飞冯者行，扫码成功；荣耀归你，行动完成。」';
+        }
+
+        function resetAll() {
+            step = 0;
+            layer1Input.value = '';
+            exerciseAnswer.value = '';
+            layer2Input.value = '';
+            usernameInput.value = '';
+            passwordInput.value = '';
+            exerciseArea.classList.add('hidden-area');
+            binaryArea.classList.add('hidden-area');
+            layer2Area.classList.add('hidden-area');
+            finalArea.classList.add('hidden-area');
+            bigRevealContainer.classList.add('hidden-area');
+            finalLinkContainer.classList.add('hidden-area');
+            binaryDisplay.classList.add('locked-content');
+            binaryDisplay.classList.remove('unlocked-content');
+            updateUI();
+            stepContent.innerHTML = `<div class="site-hint"><p style="margin:0 0 6px 0;">🔐 第一层密码位于以下站点，请前往获取：</p><code>df.qq.com/cp/havvkrelink</code><p style="margin:8px 0 0 0;font-size:0.85rem;color:#7fb4c2;">在页面中找到隐藏的密码输入框，输入后获取第一层密钥</p></div>`;
+            riddleText.textContent = '「密钥隐于站点中，输入即得第一重；核芯习题随后至，解出二进制真容。」';
+            messageBox.innerHTML = '⚡ 先获取第一层密码，完成习题解锁二进制';
+            messageBox.className = 'text-muted';
+        }
+
+        unlockLayer1Btn.addEventListener('click', unlockLayer1);
+        layer1Input.addEventListener('keydown', (e) => { if (e.key === 'Enter') unlockLayer1(); });
+        submitExerciseBtn.addEventListener('click', submitExercise);
+        exerciseAnswer.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitExercise(); });
+        unlockLayer2Btn.addEventListener('click', unlockLayer2);
+        layer2Input.addEventListener('keydown', (e) => { if (e.key === 'Enter') unlockLayer2(); });
+        unlockBtn.addEventListener('click', handleUnlock);
+
+        const resetBtn = document.createElement('button');
+        resetBtn.className = 'btn btn-secondary';
+        resetBtn.textContent = '🔄 重置';
+        resetBtn.addEventListener('click', resetAll);
+        document.querySelector('.action-row').appendChild(resetBtn);
+
+        resetAll();
+
+        console.log('☢️ 飞冯者·核芯 解密挑战');
+        console.log('🔐 第一层密码: 3707006600874797');
+        console.log('📌 习题答案: 41448');
+        console.log('🔑 第二层密码: CXZMTN1WNCD');
+        console.log('👤 用户名: GYS2026');
+        console.log('🔑 最终密码: FLUX2026');
+    })();
+</script>
+</body>
+</html>
